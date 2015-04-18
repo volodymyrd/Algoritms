@@ -1,0 +1,7 @@
+/logs/*
+/log.roo
+/.classpath
+/.project
+/.settings/*
+/target/*
+/bin/
