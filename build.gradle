@@ -3,13 +3,11 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
-        repositories {
+repositories {
 	maven {
     	url 'http://10.91.63.218/artifactory/libs-release'
-    	}
-        }
-
-
+    }
+}
 
 dependencies {
     compile group: 'junit', name: 'junit', version: '4.+'
