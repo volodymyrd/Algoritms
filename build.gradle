@@ -5,8 +5,9 @@ apply plugin: 'eclipse'
 
 repositories {
 	maven {
-    	url 'http://10.91.63.218/artifactory/libs-release'
+    	//url 'http://10.91.63.218/artifactory/libs-release'
     }
+    mavenCentral()
 }
 
 dependencies {
