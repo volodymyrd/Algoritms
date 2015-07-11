@@ -1,12 +1,17 @@
 package fifteen;
 
 public class Counter implements Comparable<Counter> {
+
+	public enum StepType {
+		TOP, DOWN, LEFT, RIGHT;
+	}
+
 	private String name;
 	private int x;
 	private int y;
 	private int currentX;
 	private int currentY;
-	private int currentPos;
+	protected int currentPos;
 
 	public Counter(int currentX, int currentY, int x, int y, String name) {
 		this.currentX = currentX;
@@ -18,6 +23,23 @@ public class Counter implements Comparable<Counter> {
 		recalcIndex();
 	}
 
+	public Counter copy() {
+		Counter c = new Counter(currentX, currentY, x, y, name);
+
+		return c;
+	}
+
+	public long currentCost() {
+		return (x - currentX) * (x - currentX) + (y - currentY)
+				* (y - currentY);
+	}
+
+	public long emptyCost(Counter empty) {
+		return (empty.currentX - currentX) * (empty.currentX - currentX)
+				+ (empty.currentY - currentY) * (empty.currentY - currentY);
+
+	}
+
 	public Counter(int currentPos, int pos, String name) {
 		to2Name(name);
 		this.currentPos = currentPos;
@@ -26,7 +48,37 @@ public class Counter implements Comparable<Counter> {
 		recalcCoordinate(pos, 1);
 	}
 
-	public int Top() {
+	public int step(StepType type) {
+		switch (type) {
+		case DOWN:
+			return down();
+		case LEFT:
+			return left();
+		case RIGHT:
+			return right();
+		case TOP:
+			return top();
+		}
+
+		return -1;
+	}
+
+	public int antiStep(StepType type) {
+		switch (type) {
+		case DOWN:
+			return top();
+		case LEFT:
+			return right();
+		case RIGHT:
+			return left();
+		case TOP:
+			return down();
+		}
+
+		return -1;
+	}
+
+	private int top() {
 		if (currentY > 1) {
 			currentY -= 1;
 
@@ -37,7 +89,7 @@ public class Counter implements Comparable<Counter> {
 			return -1;
 	}
 
-	public int Down() {
+	private int down() {
 		if (currentY < Fifteen.MAX_Y) {
 			currentY += 1;
 
@@ -48,7 +100,7 @@ public class Counter implements Comparable<Counter> {
 		return currentPos;
 	}
 
-	public int Left() {
+	private int left() {
 		if (currentX > 1) {
 			currentX -= 1;
 
@@ -60,7 +112,7 @@ public class Counter implements Comparable<Counter> {
 
 	}
 
-	public int Right() {
+	private int right() {
 		if (currentX < Fifteen.MAX_X) {
 			currentX += 1;
 
