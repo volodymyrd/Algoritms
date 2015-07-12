@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -16,7 +17,7 @@ public class Fifteen {
 	public final static int MAX_Y = 4;
 
 	private List<Counter> set = new ArrayList<>(MAX_X * MAX_Y);
-	private final Deque<List<Counter>> history = new LimitedQueue<>(5);
+	private final Deque<List<Counter>> history = new LimitedQueue<>(100);
 
 	private Fifteen() {
 		List<Integer> index = new ArrayList<>();
@@ -52,34 +53,31 @@ public class Fifteen {
 
 	public boolean nextStep() {
 
-		List<Counter> prev = history.peek();
+		// List<Counter> prev = history.peek();
 
 		List<Counter> topSet = step(StepType.TOP);
-		if (topSet != null && prev != null && equals(prev, topSet))
-			topSet = set;
-
 		List<Counter> downSet = step(StepType.DOWN);
-		if (downSet != null && prev != null && equals(prev, downSet))
-			downSet = set;
-
 		List<Counter> leftSet = step(StepType.LEFT);
-		if (leftSet != null && prev != null && equals(prev, leftSet))
-			leftSet = set;
-
 		List<Counter> rightSet = step(StepType.RIGHT);
-		if (rightSet != null && prev != null && equals(prev, rightSet))
-			rightSet = set;
 
-		long currentCost = cost(findEmpty(set), set);
-		long topCost = cost(findEmpty(topSet), topSet);
-		long downCost = cost(findEmpty(downSet), downSet);
-		long leftCost = cost(findEmpty(leftSet), leftSet);
-		long rightCost = cost(findEmpty(rightSet), rightSet);
+		// long currentCost = cost(findEmpty(set), set);
+		// printSet(topSet);
+		long topCost = topSet != null ? cost(findEmpty(topSet), topSet)
+				: Integer.MAX_VALUE;
+		// printSet(downSet);
+		long downCost = downSet != null ? cost(findEmpty(downSet), downSet)
+				: Integer.MAX_VALUE;
+		// printSet(leftSet);
+		long leftCost = leftSet != null ? cost(findEmpty(leftSet), leftSet)
+				: Integer.MAX_VALUE;
+		// printSet(rightSet);
+		long rightCost = rightSet != null ? cost(findEmpty(rightSet), rightSet)
+				: Integer.MAX_VALUE;
 
-		List<Long> costs = Stream.of(currentCost, topCost, downCost, leftCost,
-				rightCost).collect(Collectors.toList());
+		List<Long> costs = Stream.of(topCost, downCost, leftCost, rightCost)
+				.collect(Collectors.toList());
 
-		System.out.println("costs:" + costs);
+		// System.out.println("costs:" + costs);
 
 		history.push(set);
 
@@ -87,49 +85,21 @@ public class Fifteen {
 
 		switch (m) {
 		case 0:
-			costs = Stream.of(topCost, downCost, leftCost, rightCost).collect(
-					Collectors.toList());
-
-			m = min(costs);
-			switch (m) {
-			case 0:
-				set = topSet;
-				if (topCost == 0)
-					return false;
-				break;
-			case 1:
-				set = downSet;
-				if (downCost == 0)
-					return false;
-				break;
-			case 2:
-				set = leftSet;
-				if (leftCost == 0)
-					return false;
-				break;
-			case 3:
-				set = rightSet;
-				if (rightCost == 0)
-					return false;
-				break;
-			}
-			break;
-		case 1:
 			set = topSet;
 			if (topCost == 0)
 				return false;
 			break;
-		case 2:
+		case 1:
 			set = downSet;
 			if (downCost == 0)
 				return false;
 			break;
-		case 3:
+		case 2:
 			set = leftSet;
 			if (leftCost == 0)
 				return false;
 			break;
-		case 4:
+		case 3:
 			set = rightSet;
 			if (rightCost == 0)
 				return false;
@@ -153,9 +123,10 @@ public class Fifteen {
 
 		Collections.sort(s1);
 		Collections.sort(s2);
-		for (int i = 0; i < s1.size(); i++)
-			if (!s1.get(i).equals(s2.get(i)))
+		for (int i = 0; i < s1.size(); i++) {
+			if (!s1.get(i).getName().equals(s2.get(i).getName()))
 				return false;
+		}
 
 		return true;
 	}
@@ -174,9 +145,16 @@ public class Fifteen {
 			c.antiStep(type);
 			Collections.swap(copySet, op, np);
 
-			return copySet;
+			try {
+				history.stream().filter(e -> equals(e, copySet)).findFirst()
+						.get();
+			} catch (NoSuchElementException e) {
+				return copySet;
+			}
+
+			return null;
 		} else
-			return set;
+			return null;
 	}
 
 	private List<Counter> copy() {
@@ -197,7 +175,13 @@ public class Fifteen {
 
 		for (Counter e : set) {
 			// c += (e.currentCost() + e.emptyCost(empty));
+			// c += e.currentCost();
+			// if (e.getName().equals("_1")) {
 			c += e.currentCost();
+			// long c1 = e.currentCost();
+			// if (c1 != 0)
+			// c += c1 + e.emptyCost(empty);
+			// }
 		}
 
 		return c;
@@ -225,6 +209,11 @@ public class Fifteen {
 	}
 
 	public void printSet(List<Counter> set) {
+		if (set == null) {
+			System.out.println("-");
+			return;
+		}
+
 		Collections.sort(set);
 
 		printSubSet(set, 1);

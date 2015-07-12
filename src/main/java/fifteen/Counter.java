@@ -30,11 +30,14 @@ public class Counter implements Comparable<Counter> {
 	}
 
 	public long currentCost() {
+		//System.out.println("currentCost " + this);
 		return (x - currentX) * (x - currentX) + (y - currentY)
 				* (y - currentY);
 	}
 
 	public long emptyCost(Counter empty) {
+		//System.out.println("emptyCost " + this);
+		//System.out.println("emptyCost " + empty);
 		return (empty.currentX - currentX) * (empty.currentX - currentX)
 				+ (empty.currentY - currentY) * (empty.currentY - currentY);
 

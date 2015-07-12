@@ -8,7 +8,17 @@ public class Main {
 
 		// System.out.println(f.getSet());
 
-		while (f.nextStep())
-			f.printSet();
+		// f.nextStep();
+		int i = 0;
+		for (;i < 500; i++) {
+			if (f.nextStep()) {
+				//System.out.println("next step:");
+				//f.printSet();
+			} else
+				break;
+		}
+
+		System.out.println("finish for " + i + " steps");
+		f.printSet();
 	}
 }
