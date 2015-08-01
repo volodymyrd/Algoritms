@@ -1,6 +1,6 @@
 package pathfinding;
 
-public class Node {
+public abstract class Node {
 	private int h = -1;
 	private int cost = 0;
 	private Node parent = null;
@@ -25,6 +25,6 @@ public class Node {
 	public int getCost() {
 		return cost;
 	}
-	
-	public abstract <> 
+
+	public abstract <N extends Node> N[] getChildren();
 }

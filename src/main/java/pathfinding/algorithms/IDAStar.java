@@ -52,7 +52,7 @@ public class IDAStar<N extends Node> implements SearchAlgorithm<N> {
 
 	private N depthFirstSearch(N current, int currentCostBound, N goal) {
 
-		if (current.getState().equals(goal)) {
+		if (current.equals(goal)) {
 			return current;
 		}
 
@@ -63,7 +63,7 @@ public class IDAStar<N extends Node> implements SearchAlgorithm<N> {
 			// " : "+exploredNodes);
 		}
 
-		N[] children = getChildren(current);
+		N[] children = current.getChildren();
 
 		for (N next : children) {
 
