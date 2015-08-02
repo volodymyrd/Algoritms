@@ -92,7 +92,7 @@ public class IDAStar<N extends Node> implements SearchAlgorithm<N> {
 
 		FifteenNode goal = FifteenNode.getGoalState(4);
 		System.out.println("goal:" + goal);
-		FifteenNode start = FifteenNode.createRandom(4);
+		FifteenNode start = new FifteenNode(4, new byte[]{15,9,13,5,10,8,4,11,14,6,7,3,2,12,0,1});//FifteenNode.createRandom(4);
 		System.out.println("init:" + start);
 
 		IDAStar<CartesianNode> idas = new IDAStar<>(h);
@@ -102,5 +102,9 @@ public class IDAStar<N extends Node> implements SearchAlgorithm<N> {
 		System.out.println("time:" + s.getTime());
 		System.out.println("nodes:" + s.getExploredNode());
 		System.out.println("nodes:" + s.getPath().getNodes().length);
+		for(Node n : s.getPath().getNodes()){
+			System.out.println("act" + ((FifteenNode)n).getAction());
+			System.out.println(n);
+		}
 	}
 }
