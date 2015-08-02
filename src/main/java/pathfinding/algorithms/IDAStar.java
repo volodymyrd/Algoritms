@@ -1,10 +1,13 @@
 package pathfinding.algorithms;
 
+import pathfinding.CartesianNode;
+import pathfinding.FifteenNode;
 import pathfinding.HeuristicFunction;
 import pathfinding.Node;
 import pathfinding.Path;
 import pathfinding.SearchAlgorithm;
 import pathfinding.Solution;
+import pathfinding.heuristic.ManhattanDistance;
 
 /**
  * Iterative deepening A*
@@ -59,10 +62,12 @@ public class IDAStar<N extends Node> implements SearchAlgorithm<N> {
 		exploredNodes++;
 
 		if (exploredNodes % 10000 == 0) {
-			// System.err.println("explored nodes for this treshold "+currentCostBound+
+			// System.err.println("explored nodes for this treshold
+			// "+currentCostBound+
 			// " : "+exploredNodes);
 		}
 
+		//System.out.println(current);
 		N[] children = current.getChildren();
 
 		for (N next : children) {
@@ -71,7 +76,7 @@ public class IDAStar<N extends Node> implements SearchAlgorithm<N> {
 
 			if (value <= currentCostBound) {
 				N result = depthFirstSearch(next, currentCostBound, goal);
-				
+
 				if (result != null) {
 					return result;
 				}
@@ -80,5 +85,22 @@ public class IDAStar<N extends Node> implements SearchAlgorithm<N> {
 		}
 		return null;
 
+	}
+
+	public static void main(String[] args) {
+		HeuristicFunction<CartesianNode> h = new ManhattanDistance();
+
+		FifteenNode goal = FifteenNode.getGoalState(4);
+		System.out.println("goal:" + goal);
+		FifteenNode start = FifteenNode.createRandom(4);
+		System.out.println("init:" + start);
+
+		IDAStar<CartesianNode> idas = new IDAStar<>(h);
+
+		Solution s = idas.resolve(start, goal);
+
+		System.out.println("time:" + s.getTime());
+		System.out.println("nodes:" + s.getExploredNode());
+		System.out.println("nodes:" + s.getPath().getNodes().length);
 	}
 }
