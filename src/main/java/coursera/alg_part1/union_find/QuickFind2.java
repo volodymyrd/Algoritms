@@ -6,46 +6,52 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class QuickFind {
+public class QuickFind2 {
 
 	private int[] id;
 
-	public QuickFind(int N) {
+	public QuickFind2(int N) {
 		id = new int[N];
 		for (int i = 0; i < N; i++)
 			id[i] = i;
 	}
 
 	public boolean connected(int p, int q) {
-		return id[p] == id[q];
+		return root(p) == root(q);
 	}
 
 	public void union(int p, int q) {
-		int pid = id[p];
-		int qid = id[q];
-		for (int i = 0; i < id.length; i++)
-			if (id[i] == pid)
-				id[i] = qid;
+		int rootP = root(p);
+		int rootQ = root(q);
+		id[rootP] = rootQ;
+	}
+
+	private int root(int i) {
+		while (i != id[i])
+			i = id[i];
+
+		return i;
+	}
+
+	@Override
+	public String toString() {
+		return Arrays.toString(id);
 	}
 
 	public Map<Integer, List<Integer>> groups() {
 		Map<Integer, List<Integer>> gr = new HashMap<>();
 
 		for (int i = 0; i < id.length; i++) {
-			if (gr.containsKey(id[i])) {
-				gr.get(id[i]).add(i);
+			int root = root(id[i]);
+			if (gr.containsKey(root)) {
+				gr.get(root).add(i);
 			} else {
 				List<Integer> e = new ArrayList<>();
 				e.add(i);
-				gr.put(id[i], e);
+				gr.put(root, e);
 			}
 		}
 		return gr;
-	}
-
-	@Override
-	public String toString() {
-		return Arrays.toString(id);
 	}
 
 	public static void main(String[] args) {
