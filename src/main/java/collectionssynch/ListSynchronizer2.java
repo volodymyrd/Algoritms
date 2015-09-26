@@ -1,12 +1,13 @@
 package collectionssynch;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.SortedMap;
 
-public class ListSynchronizer<L, R> {
-	public interface ItemComparator<L, R> {
-		boolean itemsEquals(L leftItem, R rightItem);
-	}
+public class ListSynchronizer2<L, R, K> {
+	private Comparator<K> comparator;
 
 	public static class Pair<Lt, Rt> {
 		private final Lt left;
@@ -57,15 +58,9 @@ public class ListSynchronizer<L, R> {
 		}
 	}
 
-	private final ItemComparator<L, R> itemComparator;
-
 	private List<L> insertItems = new ArrayList<>();
 	private List<Pair<L, R>> updateItems = new ArrayList<>();
-	private List<R> removeItems;
-
-	public ListSynchronizer(ItemComparator<L, R> itemComparator) {
-		this.itemComparator = itemComparator;
-	}
+	private List<R> removeItems = new ArrayList<>();
 
 	public List<L> getInsertItems() {
 		return insertItems;
@@ -79,43 +74,26 @@ public class ListSynchronizer<L, R> {
 		return removeItems;
 	}
 
-	public void synchronize(final List<L> leftItems, final List<R> rightItems) {
-		if (isEmpty(leftItems) && isEmpty(rightItems))
-			return;
-		else if (!isEmpty(leftItems) && isEmpty(rightItems)) {
-			insertItems = new ArrayList<>(leftItems);
+	public ListSynchronizer2(Comparator<K> comparator) {
+		this.comparator = comparator;
+	}
+	
+	public void synchronize(final SortedMap<K, L> leftItems, final SortedMap<K, R> rightItems) {
+		List<K> rKeyList = new ArrayList<>(rightItems.keySet());
+		List<K> lKeyList = new ArrayList<>(leftItems.keySet());
 
-			return;
-		} else if (isEmpty(leftItems) && !isEmpty(rightItems)) {
-			removeItems = new ArrayList<>(rightItems);
-
-			return;
-		}
-
-		List<R> rightItemsCopy = new ArrayList<>(rightItems.size());
-		removeItems = new ArrayList<>(rightItems);
-
-		leftItems.stream().forEach(l -> {
-			boolean found = false;
-			for (R r : rightItems) {
-				if (itemComparator.itemsEquals(l, r)) {
-					found = true;
-					Pair<L, R> p = new Pair<>(l, r);
-					updateItems.add(p);
-					rightItemsCopy.add(r);
-
-					break;
-				}
-			}
-
-			if (!found)
+		leftItems.forEach((k, l) -> {
+			int i = Collections.binarySearch(rKeyList, k, comparator);
+			if (i > -1)
+				updateItems.add(new Pair<L, R>(l, rightItems.get(rKeyList.get(i))));
+			else
 				insertItems.add(l);
 		});
 
-		removeItems.removeAll(rightItemsCopy);
-	}
-
-	private boolean isEmpty(List<?> l) {
-		return l == null || l.size() == 0;
+		rightItems.forEach((k, r) -> {
+			int i = Collections.binarySearch(lKeyList, k, comparator);
+			if (i < 0)
+				removeItems.add(r);
+		});
 	}
 }
