@@ -10,6 +10,8 @@ public class QuickFindTest {
 		QuickFind qf = new QuickFind(10);
 		QuickFind2 qf2 = new QuickFind2(10);
 
+		long s = System.nanoTime();
+
 		qf.union(1, 2);
 		qf.union(3, 4);
 		qf.union(5, 6);
@@ -19,6 +21,10 @@ public class QuickFindTest {
 		qf.union(0, 5);
 		qf.union(1, 9);
 
+		System.out.println("qf: " + (System.nanoTime() - s) / 1000.0 + "mks");
+
+		s = System.nanoTime();
+		
 		qf2.union(1, 2);
 		qf2.union(3, 4);
 		qf2.union(5, 6);
@@ -27,6 +33,8 @@ public class QuickFindTest {
 		qf2.union(2, 8);
 		qf2.union(0, 5);
 		qf2.union(1, 9);
+
+		System.out.println("qf: " + (System.nanoTime() - s) / 1000.0 + "mks");
 
 		assertEquals(qf.groups(), qf2.groups());
 	}
